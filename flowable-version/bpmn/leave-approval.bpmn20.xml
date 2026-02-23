@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             id="leaveApprovalDefinitions"
+             targetNamespace="http://www.flowable.org/processdef">
+
+    <!-- Process Definition -->
+    <process id="leaveApproval" name="Leave Approval Process" isExecutable="true">
+        
+        <!-- Documentation -->
+        <documentation>
+            Leave Request Approval Workflow for PT. Len Industri
+            - Submitted by Employee
+            - Approved/Rejected by Manager
+            - Approved/Rejected by HR (Final)
+        </documentation>
+
+        <!-- Start Event -->
+        <startEvent id="startEvent" name="Leave Request Submitted"/>
+
+        <!-- Sequence Flows -->
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="managerApprovalTask"/>
+
+        <!-- Manager Approval User Task -->
+        <userTask id="managerApprovalTask" name="Manager Approval" 
+                  flowable:candidateGroups="managers">
+            <documentation>
+                Manager reviews the leave request and decides to approve or reject
+            </documentation>
+        </userTask>
+
+        <!-- Gateway: Manager Decision -->
+        <exclusiveGateway id="managerDecisionGateway" name="Manager Decision"/>
+
+        <sequenceFlow id="flow2" sourceRef="managerApprovalTask" targetRef="managerDecisionGateway"/>
+
+        <!-- Manager Approved Flow -->
+        <sequenceFlow id="flow3" sourceRef="managerDecisionGateway" targetRef="hrApprovalTask">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${managerApproved == true}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- Manager Rejected Flow (End) -->
+        <sequenceFlow id="flow4" sourceRef="managerDecisionGateway" targetRef="managerRejectedEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${managerApproved == false}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- HR Approval User Task -->
+        <userTask id="hrApprovalTask" name="HR Approval"
+                  flowable:candidateGroups="hr">
+            <documentation>
+                HR reviews the leave request (after manager approval) and decides final approval or rejection
+            </documentation>
+        </userTask>
+
+        <!-- Gateway: HR Decision -->
+        <exclusiveGateway id="hrDecisionGateway" name="HR Decision"/>
+
+        <sequenceFlow id="flow5" sourceRef="hrApprovalTask" targetRef="hrDecisionGateway"/>
+
+        <!-- HR Approved Flow (End) -->
+        <sequenceFlow id="flow6" sourceRef="hrDecisionGateway" targetRef="hrApprovedEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${hrApproved == true}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- HR Rejected Flow (End) -->
+        <sequenceFlow id="flow7" sourceRef="hrDecisionGateway" targetRef="hrRejectedEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${hrApproved == false}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- End Events -->
+        <endEvent id="managerRejectedEnd" name="Rejected by Manager"/>
+        <endEvent id="hrApprovedEnd" name="Approved by HR"/>
+        <endEvent id="hrRejectedEnd" name="Rejected by HR"/>
+
+    </process>
+
+    <!-- BPMN Diagram Information -->
+    <bpmndi:BPMNDiagram id="leaveApprovalBPMNDiagram">
+        <bpmndi:BPMNPlane id="leaveApprovalBPMNPlane" bpmnElement="leaveApproval">
+            <!-- Plane elements would be defined here -->
+        </bpmndi:BPMNPlane>
+    </bpmndi:BPMNDiagram>
+
+</definitions>
