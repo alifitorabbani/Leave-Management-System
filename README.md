@@ -1,13 +1,13 @@
 # Leave Management System — Workflow Engine Comparison
 
-**Proyek Internal R&D | PT. Len Industri (epersero)**  
+**Proyek Internal R&D | PT. Len Industri (Persero)**  
 **Pengembang: Alifito Rabbani Cahyono — Backend Engineer Intern (Workflow Research)**
 
 ---
 
 ## 📋 Deskripsi Proyek
 
-Repository ini merupakan proyek penelitian dan pengembangan internal yang dibuat selama magang di **PT. Len Industri (epersero)**, sebuah Badan Usaha Milik Negara (BUMN) yang bergerak di bidang teknologi dan industri pertahanan.
+Repository ini merupakan proyek penelitian dan pengembangan internal yang dibuat selama magang di **PT. Len Industri (Persero)**, sebuah Badan Usaha Milik Negara (BUMN) yang bergerak di bidang teknologi dan industri pertahanan.
 
 Proyek ini membandingkan **tiga pendekatan implementasi workflow** untuk sistem pengajuan cuti perusahaan:
 
@@ -30,21 +30,7 @@ Tujuan utama adalah menganalisis kelebihan, kekurangan, kompleksitas, dan kesesu
 | **Penulis** | Alifito Rabbani Cahyono |
 | **Peran** | Backend Engineer Intern — Workflow & BPM Research |
 | **Tipe Proyek** | Proyek Riset Internal (R&D) |
-| **Tahun** | 2024-2025 |
 | **Tanggal Audit** | 2026-02-26 |
-
----
-
-## 🏢 Konteks Perusahaan
-
-| Aspek | Detail |
-|-------|--------|
-| **Perusahaan** | PT. Len Industri (epersero) |
-| **Divisi** | IT Governance & Development |
-| **Penulis** | Alifito Rabbani Cahyono |
-| **Peran** | Backend Engineer Intern — Workflow & BPM Research |
-| **Tipe Proyek** | Proyek Riset Internal (R&D) |
-| **Tahun** | 2024-2025 |
 
 ---
 
@@ -473,6 +459,68 @@ Setelah menjalankan aplikasi, berikut akun yang dapat digunakan untuk testing:
 | **Budget sangat terbatas** | Manual |
 | **Compliance ketat** | Flowable Enterprise |
 | **Tim kecil** | Manual atau Deboot |
+
+---
+
+## 🎓 Analogi & Perumpamaan
+
+Untuk memahami perbedaan ketiga pendekatan ini, berikut analogi yang dapat membantu:
+
+### 1. Perumpamaan: Membandingkan dengan Kehidupan Sehari-hari
+
+| Pendekatan | Analogi | Penjelasan |
+|------------|---------|------------|
+| **Manual** | **Resep Masakan Tradisional** | Semua resep ditulis tangan,chef harus menghafal langkah-langkah, jika ingin mengubahmenu harus menulis ulang resep |
+| **Flowable** | **Restoran dengan Sistem Profesional** | Proses masak terdokumentasi dalam SOP lengkap, ada visualisasi kitchen, setiap staf tahu apa yang harus dilakukan |
+| **Deboot** | **Kitchen Modern dengan Chef AI** | Menggunakan peralatan modern (Flowable) tetapi dengan panduan yang lebih sederhana - cukup tekan tombol, makanan jadi |
+
+### 2. Perumpamaan: Dalam Konteks Transportasi
+
+| Pendekatan | Analogi | Penjelasan |
+|------------|---------|------------|
+| **Manual** | **Sepeda Manual** | Sederhana, murah, mudah diperbaiki, tapi terbatas kecepatan dan jarak |
+| **Flowable** | **Pesawat Komersial** | Sistem kompleks dengan banyak fitur, perlu pelatihan khusus untuk mengoperasikannya, sangat powerful |
+| **Deboot** | **Mobil Listrik** | Menggunakan teknologi modern (seperti Flowable) tetapi dengan pengoperasian yang lebih sederhana |
+
+### 3. Perumpamaan: Dalam Konteks Menulis
+
+| Pendekatan | Analogi | Penjelasan |
+|------------|---------|------------|
+| **Manual** | **Menulis dengan Pensil** | Langsung, sederhana, kontrol penuh, tapi perlu effort lebih untuk menghapus/mengubah |
+| **Flowable** | **Menulis dengan Word Processor + Flowchart** | Dapat membuat diagram alur, undo/redo mudah, tapi perlu belajar fiturnya |
+| **Deboot** | **Menulis dengan AI Assistant** | Banyak bantuan otomatis, lebih cepat, tapi perlu sedikit penyesuaian |
+
+### 4. Kapan Menggunakan Analogi Ini?
+
+- **Manual**: Seperti memilih **sepeda** untuk pergi ke toko dekat - sederhana dan cukup untuk kebutuhan dasar
+- **Flowable**: Seperti memilih **pesawat** untuk perjalanan bisnis internasional - overkill untuk jarak dekat, tapi necessary untuk jarak jauh
+- **Deboot**: Seperti memilih **mobil** untuk sehari-hari - compromise antara kemudahan dan kemampuan
+
+### 5. Ringkasan Perumpamaan Visual
+
+```
+                    Kompleksitas
+                         ▲
+                         │
+        Flowable        │    Pesawat Komersial
+        (BPMN)         │    (Fitur lengkap,
+         ─────────      │    tapi kompleks)
+                         │
+                         │
+        Deboot  ────────┼────── Mobil Listrik
+        (Service)      │    (Modern, mudah,
+                         │    cukup powerful)
+                         │
+                         │
+        Manual  ────────┴────── Sepeda
+                         │    (Sederhana,
+                         │    murah, terbatas)
+                         │
+                         └────────────────────────▶
+                                    Biaya
+```
+
+**Garis bawahi**: Tidak ada yang lebih baik atau lebih buruk - semuanya tergantung konteks dan kebutuhan!
 
 ### Kapan Manual Workflow?
 - Proses bisnis sederhana dan stabil
