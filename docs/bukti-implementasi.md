@@ -11,6 +11,8 @@
 
 ### 1.1 Enum Status (State Machine)
 
+**File:** `manual-version/backend/src/main/java/com/len/leave/manual/entity/LeaveStatus.java`
+
 ```java
 package com.len.leave.manual.entity;
 
@@ -33,12 +35,22 @@ public enum LeaveStatus {
     public boolean isFinalState() {
         return this == MANAGER_REJECTED || this == HR_APPROVED || this == HR_REJECTED;
     }
+
+    public boolean requiresManagerApproval() {
+        return this == PENDING;
+    }
+
+    public boolean requiresHRApproval() {
+        return this == MANAGER_APPROVED;
+    }
 }
 ```
 
-**Penjelasan**: Enum ini mendefinisikan semua kemungkinan status dalam workflow. Setiap status memiliki nama tampilan dan kode pesan untuk internacionalisasi.
+**Penjelasan**: Enum ini mendefinisikan semua kemungkinan status dalam workflow. Setiap status memiliki nama tampilan dan kode pesan untuk internasionalisasi.
 
 ### 1.2 If-Else State Transition Logic
+
+**File:** `manual-version/backend/src/main/java/com/len/leave/manual/service/LeaveRequestService.java`
 
 ```java
 @Transactional
@@ -52,7 +64,9 @@ public LeaveRequestDTO.Response managerApproval(UUID requestId, LeaveRequestDTO.
     }
 
     // Determine new status based on approval decision
-    LeaveStatus newStatus = LeaveStatus.MANAGER_APPROVED;
+    LeaveStatus newStatus = approval.isApproved() 
+        ? LeaveStatus.MANAGER_APPROVED 
+        : LeaveStatus.MANAGER_REJECTED;
     
     // Update request
     request.setStatus(newStatus);
@@ -71,13 +85,58 @@ public LeaveRequestDTO.Response managerApproval(UUID requestId, LeaveRequestDTO.
 }
 ```
 
-**Penjelasan**: Logika transisi status menggunakan if-else untuk memvalidasi apakah transisi yang diminta valid. Setiap transisi hanya dapat dilakukan dari status tertentu.
+**Penjelasan**: Logika transisi status menggunakan if-else untuk memproses approval atau rejection. Setiap transisi hanya dapat dilakukan dari status tertentu.
+
+### 1.3 Controller - REST API
+
+**File:** `manual-version/backend/src/main/java/com/len/leave/manual/controller/LeaveRequestController.java`
+
+```java
+@RestController
+@RequestMapping("/api/leave-requests")
+@RequiredArgsConstructor
+public class LeaveRequestController {
+
+    private final LeaveRequestService leaveRequestService;
+
+    @PostMapping
+    public ResponseEntity<ApiResponse<LeaveRequestDTO.Response>> createRequest(
+            @Valid @RequestBody LeaveRequestDTO.CreateRequest request) {
+        LeaveRequestDTO.Response response = leaveRequestService.createRequest(request);
+        return ResponseEntity.ok(ApiResponse.success(response, "Leave request created successfully"));
+    }
+
+    @PostMapping("/{id}/manager-approval")
+    public ResponseEntity<ApiResponse<LeaveRequestDTO.Response>> managerApproval(
+            @PathVariable UUID id,
+            @Valid @RequestBody LeaveRequestDTO.ApprovalRequest approval) {
+        LeaveRequestDTO.Response response = leaveRequestService.managerApproval(id, approval);
+        return ResponseEntity.ok(ApiResponse.success(response, "Manager approval processed"));
+    }
+
+    @PostMapping("/{id}/hr-approval")
+    public ResponseEntity<ApiResponse<LeaveRequestDTO.Response>> hrApproval(
+            @PathVariable UUID id,
+            @Valid @RequestBody LeaveRequestDTO.ApprovalRequest approval) {
+        LeaveRequestDTO.Response response = leaveRequestService.hrApproval(id, approval);
+        return ResponseEntity.ok(ApiResponse.success(response, "HR approval processed"));
+    }
+
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<LeaveRequestDTO.Response>>> getAllRequests() {
+        List<LeaveRequestDTO.Response> responses = leaveRequestService.getAllRequests();
+        return ResponseEntity.ok(ApiResponse.success(responses));
+    }
+}
+```
 
 ---
 
 ## 2. Flowable Version - Implementasi Kode
 
 ### 2.1 RuntimeService Usage
+
+**File:** `flowable-version/backend/src/main/java/com/len/leave/flowable/service/LeaveWorkflowService.java`
 
 ```java
 private final RuntimeService runtimeService;
@@ -94,7 +153,7 @@ public LeaveRequestDTO.Response submitRequest(LeaveRequestDTO.CreateRequest requ
     variables.put("startDate", request.getStartDate().toString());
     variables.put("endDate", request.getEndDate().toString());
     variables.put("reason", request.getReason());
-    variables.put("leaveRequestId", saved.getId().toString());
+    variables.put("requestId", saved.getId().toString());
 
     // Start process instance
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
@@ -102,6 +161,10 @@ public LeaveRequestDTO.Response submitRequest(LeaveRequestDTO.CreateRequest requ
             saved.getId().toString(),  // Business key
             variables  // Process variables
     );
+
+    // Update with process instance ID
+    saved.setWorkflowInstanceId(processInstance.getId());
+    leaveRequestRepository.save(saved);
 
     log.info("Flowable process started with ID: {}", processInstance.getId());
     return mapToResponse(saved);
@@ -143,6 +206,8 @@ public LeaveRequestDTO.Response completeManagerApproval(String taskId, boolean a
 
 ### 2.3 BPMN XML Definition
 
+**File:** `flowable-version/bpmn/leave-approval.bpmn20.xml`
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -155,21 +220,26 @@ public LeaveRequestDTO.Response completeManagerApproval(String taskId, boolean a
         <!-- Start Event -->
         <startEvent id="startEvent" name="Leave Request Submitted"/>
         
+        <!-- Sequence Flow: Start → Manager Approval -->
+        <sequenceFlow id="flow1" sourceRef="startEvent" targetRef="managerApprovalTask"/>
+
         <!-- Manager Approval Task -->
         <userTask id="managerApprovalTask" name="Manager Approval" 
                   flowable:candidateGroups="managers">
         </userTask>
 
-        <!-- Exclusive Gateway for Decision -->
+        <!-- Gateway: Manager Decision -->
         <exclusiveGateway id="managerDecisionGateway" name="Manager Decision"/>
+        <sequenceFlow id="flow2" sourceRef="managerApprovalTask" targetRef="managerDecisionGateway"/>
 
-        <!-- Conditional Flow -->
+        <!-- Conditional Flow: Approve -->
         <sequenceFlow id="flow3" sourceRef="managerDecisionGateway" targetRef="hrApprovalTask">
             <conditionExpression xsi:type="tFormalExpression">
                 ${managerApproved == true}
             </conditionExpression>
         </sequenceFlow>
 
+        <!-- Conditional Flow: Reject -->
         <sequenceFlow id="flow4" sourceRef="managerDecisionGateway" targetRef="managerRejectedEnd">
             <conditionExpression xsi:type="tFormalExpression">
                 ${managerApproved == false}
@@ -181,7 +251,26 @@ public LeaveRequestDTO.Response completeManagerApproval(String taskId, boolean a
                   flowable:candidateGroups="hr">
         </userTask>
 
+        <!-- Gateway: HR Decision -->
+        <exclusiveGateway id="hrDecisionGateway" name="HR Decision"/>
+        <sequenceFlow id="flow5" sourceRef="hrApprovalTask" targetRef="hrDecisionGateway"/>
+
+        <!-- HR Approved End -->
+        <sequenceFlow id="flow6" sourceRef="hrDecisionGateway" targetRef="hrApprovedEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${hrApproved == true}
+            </conditionExpression>
+        </sequenceFlow>
+
+        <!-- HR Rejected End -->
+        <sequenceFlow id="flow7" sourceRef="hrDecisionGateway" targetRef="hrRejectedEnd">
+            <conditionExpression xsi:type="tFormalExpression">
+                ${hrApproved == false}
+            </conditionExpression>
+        </sequenceFlow>
+
         <!-- End Events -->
+        <endEvent id="managerRejectedEnd" name="Rejected by Manager"/>
         <endEvent id="hrApprovedEnd" name="Approved by HR"/>
         <endEvent id="hrRejectedEnd" name="Rejected by HR"/>
 
@@ -195,99 +284,227 @@ public LeaveRequestDTO.Response completeManagerApproval(String taskId, boolean a
 
 ## 3. Deboot Version - Implementasi Kode
 
-### 3.1 Deboot Annotation Example
+### 3.1 Service Implementation
+
+**File:** `deboot-version/backend/src/main/java/com/len/leave/deboot/service/DebootLeaveWorkflowService.java`
 
 ```java
-package com.len.leave.deboot.service;
-
-import com.deboot.annotation.*;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@WorkflowDefinition(
-    key = "leaveApprovalDeboot",
-    name = "Leave Approval Process",
-    description = "Leave request approval workflow with Deboot"
-)
 public class DebootLeaveWorkflowService {
 
+    private final RuntimeService runtimeService;
+    private final TaskService taskService;
+    private final HistoryService historyService;
+    private final LeaveRequestRepository leaveRequestRepository;
+    private final AuditLogRepository auditLogRepository;
+
+    private static final String PROCESS_DEFINITION_KEY = "leaveApproval";
+
     /**
-     * Submit request with @WorkflowStart annotation
-     * Deboot handles process instantiation automatically
+     * Submit a new leave request
+     * Starts a new Flowable process for leave approval
      */
     @Transactional
-    @WorkflowStart(
-        variables = {
-            @VariableMapping(name = "employeeName", source = "employeeName"),
-            @VariableMapping(name = "leaveType", source = "leaveType"),
-            @VariableMapping(name = "startDate", source = "startDate"),
-            @VariableMapping(name = "endDate", source = "endDate"),
-            @VariableMapping(name = "reason", source = "reason")
-        }
-    )
     public LeaveRequestDTO.Response submitRequest(LeaveRequestDTO.CreateRequest request) {
-        // Save to database
+        log.info("Starting leave workflow using Flowable");
+        
+        // Validation
+        if (request.getEndDate().isBefore(request.getStartDate())) {
+            throw new IllegalArgumentException("End date cannot be before start date");
+        }
+
+        // Save leave request
+        LeaveRequest leaveRequest = LeaveRequest.builder()
+                .employeeName(request.getEmployeeName())
+                .employeeId(request.getEmployeeId())
+                .department(request.getDepartment())
+                .leaveType(request.getLeaveType())
+                .startDate(request.getStartDate())
+                .endDate(request.getEndDate())
+                .reason(request.getReason())
+                .status(LeaveStatus.PENDING)
+                .build();
+
         LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
         
-        // Deboot automatically starts the Flowable process
-        log.info("Leave request saved, Deboot handles BPM process start");
+        // Start Flowable process directly
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("employeeName", request.getEmployeeName());
+        variables.put("leaveType", request.getLeaveType().name());
+        variables.put("startDate", request.getStartDate().toString());
+        variables.put("endDate", request.getEndDate().toString());
+        variables.put("requestId", saved.getId().toString());
+        
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(
+                PROCESS_DEFINITION_KEY, 
+                saved.getId().toString(), 
+                variables
+        );
+        
+        // Update with process instance ID
+        saved.setWorkflowInstanceId(processInstance.getId());
+        leaveRequestRepository.save(saved);
+        
+        log.info("Process started with ID: {}", processInstance.getId());
+
+        return mapToResponse(saved);
+    }
+
+    /**
+     * Approve by manager
+     */
+    @Transactional
+    public LeaveRequestDTO.Response approveByManager(UUID requestId, LeaveRequestDTO.ApprovalRequest approvalRequest) {
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+        
+        if (leaveRequest.getStatus() != LeaveStatus.PENDING) {
+            throw new IllegalStateException("Request is not in pending status");
+        }
+        
+        // Complete manager task
+        List<Task> tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("manager")
+                .processInstanceId(leaveRequest.getWorkflowInstanceId())
+                .list();
+        
+        for (Task task : tasks) {
+            taskService.complete(task.getId(), Map.of("approved", true, "comment", approvalRequest.getComment()));
+        }
+        
+        // Update status
+        leaveRequest.setStatus(LeaveStatus.MANAGER_APPROVED);
+        leaveRequest.setManagerComment(approvalRequest.getComment());
+        leaveRequest.setApprovedByManager(approvalRequest.getApprovedBy());
+        leaveRequest.setManagerApprovalDate(LocalDateTime.now());
+        
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+        log.info("Leave request {} approved by manager", requestId);
         
         return mapToResponse(saved);
     }
 
     /**
-     * Manager approval with @WorkflowTask annotation
-     * Deboot automatically handles task assignment and completion
+     * Reject by manager
      */
     @Transactional
-    @WorkflowTask(
-        taskName = "managerApproval",
-        candidateGroup = "managers",
-        variables = {
-            @VariableMapping(name = "approved", source = "approved"),
-            @VariableMapping(name = "comment", source = "comment"),
-            @VariableMapping(name = "approvedBy", source = "approvedBy")
+    public LeaveRequestDTO.Response rejectByManager(UUID requestId, LeaveRequestDTO.ApprovalRequest approvalRequest) {
+        LeaveRequest leaveRequest = leaveRequestRepository.findById(requestId)
+                .orElseThrow(() -> new RuntimeException("Leave request not found"));
+        
+        if (leaveRequest.getStatus() != LeaveStatus.PENDING) {
+            throw new IllegalStateException("Request is not in pending status");
         }
-    )
-    public LeaveRequestDTO.Response completeManagerApproval(UUID requestId, boolean approved, 
-                                                         String comment, String approvedBy) {
+        
+        // Complete manager task with rejection
+        List<Task> tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("manager")
+                .processInstanceId(leaveRequest.getWorkflowInstanceId())
+                .list();
+        
+        for (Task task : tasks) {
+            taskService.complete(task.getId(), Map.of("approved", false, "comment", approvalRequest.getComment()));
+        }
+        
         // Update status
-        LeaveRequest request = leaveRequestRepository.findById(requestId)
-                .orElseThrow(() -> new RuntimeException("Request not found"));
+        leaveRequest.setStatus(LeaveStatus.MANAGER_REJECTED);
+        leaveRequest.setManagerComment(approvalRequest.getComment());
+        leaveRequest.setApprovedByManager(approvalRequest.getApprovedBy());
+        leaveRequest.setManagerApprovalDate(LocalDateTime.now());
+        
+        LeaveRequest saved = leaveRequestRepository.save(leaveRequest);
+        log.info("Leave request {} rejected by manager", requestId);
+        
+        return mapToResponse(saved);
+    }
 
-        request.setStatus(approved ? LeaveStatus.MANAGER_APPROVED : LeaveStatus.MANAGER_REJECTED);
+    /**
+     * Get pending tasks for manager
+     */
+    public List<LeaveRequestDTO.Response> getManagerPendingTasks() {
+        List<Task> tasks = taskService.createTaskQuery()
+                .taskCandidateGroup("manager")
+                .processDefinitionKey(PROCESS_DEFINITION_KEY)
+                .list();
         
-        // Deboot automatically completes the task in Flowable
-        log.info("Manager approval processed by Deboot");
-        
-        return mapToResponse(leaveRequestRepository.save(request));
+        List<LeaveRequestDTO.Response> result = new ArrayList<>();
+        for (Task task : tasks) {
+            String requestId = (String) taskService.getVariable(task.getId(), "requestId");
+            LeaveRequest leaveRequest = leaveRequestRepository.findById(UUID.fromString(requestId)).orElse(null);
+            if (leaveRequest != null) {
+                result.add(mapToResponse(leaveRequest));
+            }
+        }
+        return result;
     }
 }
 ```
 
-**Penjelasan**: Deboot menggunakan annotations untuk mendefinisikan workflow tanpa perlu menulis BPMN XML secara manual. Annotations `@WorkflowDefinition`, `@WorkflowStart`, dan `@WorkflowTask` menyederhanakan konfigurasi Flowable.
+**Penjelasan**: Deboot version menggunakan Flowable secara langsung melalui service, tanpa memerlukan definisi BPMN XML. Pendekatan ini lebih sederhana karena semua logika ada di kode Java.
 
 ---
 
 ## 4. Perbandingan Implementasi
 
+### 4.1 tabel Perbandingan
+
 | Aspek | Manual | Flowable | Deboot |
 |-------|--------|----------|--------|
-| **State Management** | Enum + If-else | BPMN XML | Annotations |
-| **Proses Start** | Langsung simpan DB | `runtimeService.startProcessInstanceByKey()` | `@WorkflowStart` |
-| **Task Completion** | Update status manual | `taskService.complete()` | `@WorkflowTask` |
+| **State Management** | Enum + If-else | BPMN XML | Service Code |
+| **Proses Start** | Langsung simpan DB | `runtimeService.startProcessInstanceByKey()` | `runtimeService.startProcessInstanceByKey()` |
+| **Task Completion** | Update status manual | `taskService.complete()` | `taskService.complete()` |
+| **Task Query** | Database query | `taskService.createTaskQuery()` | `taskService.createTaskQuery()` |
 | **Audit Trail** | Manual (tabel audit_logs) | Otomatis (Flowable History) | Otomatis |
 | **Kompleksitas Kode** | Tinggi | Medium | Rendah |
+| **BPMN File** | ❌ | ✅ | ❌ |
+| **Dependency** | Spring Boot only | Flowable 6.8.0 | Flowable 6.8.0 |
+
+### 4.2 Perbandingan LOC
+
+| Versi | Backend LOC | Frontend LOC | Total |
+|-------|------------|--------------|-------|
+| Manual | 1,731 | 1,364 | 3,095 |
+| Flowable | 1,563 | 1,364 | 2,927 |
+| Deboot | 1,482 | 1,364 | 2,846 |
 
 ---
 
-## 5. Kesimpulan
+## 5. Sample Data (DataInitializer)
+
+Setiap versi memiliki DataInitializer yang membuat sample data untuk pengujian:
+
+### 5.1 Distribusi Status pada Sample Data
+
+| Status | Jumlah Request |
+|--------|---------------|
+| PENDING | 6 |
+| MANAGER_APPROVED | 4 |
+| HR_APPROVED | 4 |
+| MANAGER_REJECTED | 2 |
+| HR_REJECTED | 2 |
+| **Total** | **18** |
+
+### 5.2 Jenis Cuti pada Sample Data
+
+| Leave Type | Keterangan |
+|------------|-------------|
+| ANNUAL | Cuti tahunan |
+| SICK | Cuti sakit |
+| PERSONAL | Cuti pribadi |
+| MATERNITY | Cuti melahirkan |
+
+---
+
+## 6. Kesimpulan
 
 Bukti implementasi di atas menunjukkan bahwa:
 
-1. **Manual Version** memerlukan logika if-else yang eksplisit untuk setiap transisi status
-2. **Flowable Version** mendelegasikan manajemen workflow ke engine BPMN dengan BPMN XML
-3. **Deboot Version** menyederhanakan Flowable dengan annotation-driven approach
+1. **Manual Version** memerlukan logika if-else yang eksplisit untuk setiap transisi status, dengan kompleksitas kode tertinggi (1,731 LOC)
 
-Setiap pendekatan memiliki trade-off antara kompleksitas, fleksibilitas, dan kemudahan maintenance.
+2. **Flowable Version** mendelegasikan manajemen workflow ke engine BPMN dengan BPMN XML, memberikan visualisasi dan audit trail otomatis
+
+3. **Deboot Version** menggunakan Flowable secara langsung melalui service code tanpa BPMN XML, memberikan keseimbangan antara simplicity dan fungsionalitas
+
+Setiap pendekatan memiliki trade-off antara kompleksitas, fleksibilitas, dan kemudahan maintenance. Pilihan tergantung pada kebutuhan spesifik proyek dan tim.

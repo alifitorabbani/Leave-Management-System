@@ -1,21 +1,23 @@
 # Leave Management System — Workflow Engine Comparison
 
-**Proyek Internal R&D | PT. Len Industri (Persero)**  
+**Proyek Internal R&D | PT. Len Industri (epersero)**  
 **Pengembang: Alifito Rabbani Cahyono — Backend Engineer Intern (Workflow Research)**
 
 ---
 
 ## 📋 Deskripsi Proyek
 
-Repository ini merupakan proyek penelitian dan pengembangan internal yang dibuat selama magang di **PT. Len Industri (Persero)**, sebuah Badan Usaha Milik Negara (BUMN) yang bergerak di bidang teknologi dan industri pertahanan.
+Repository ini merupakan proyek penelitian dan pengembangan internal yang dibuat selama magang di **PT. Len Industri (epersero)**, sebuah Badan Usaha Milik Negara (BUMN) yang bergerak di bidang teknologi dan industri pertahanan.
 
 Proyek ini membandingkan **tiga pendekatan implementasi workflow** untuk sistem pengajuan cuti perusahaan:
 
 1. **Manual Workflow** — Implementasi dengan state machine berbasis kode (if-else, enum)
 2. **Flowable BPM** — Implementasi menggunakan Flowable BPMN Engine (Community Edition)
-3. **Deboot Framework** — Implementasi menggunakan Deboot (akselerator di atas Flowable)
+3. **Deboot Framework** — Implementasi menggunakan Flowable dengan pendekatan yang disederhanakan (service-based tanpa BPMN XML)
 
 Tujuan utama adalah menganalisis kelebihan, kekurangan, kompleksitas, dan kesesuaian masing-masing pendekatan untuk konteks enterprise.
+
+> **📝 Catatan Penting**: Deboot dalam proyek ini diimplementasikan sebagai **pendekatan service-based** menggunakan Flowable secara langsung, bukan sebagai framework terpisah. Ini menunjukkan bagaimana Flowable dapat digunakan dengan cara yang lebih sederhana tanpa memerlukan pengetahuan BPMN XML.
 
 ---
 
@@ -23,20 +25,36 @@ Tujuan utama adalah menganalisis kelebihan, kekurangan, kompleksitas, dan kesesu
 
 | Aspek | Detail |
 |-------|--------|
-| **Perusahaan** | PT. Len Industri (Persero) |
+| **Perusahaan** | PT. Len Industri (epersero) |
 | **Divisi** | IT Governance & Development |
 | **Penulis** | Alifito Rabbani Cahyono |
 | **Peran** | Backend Engineer Intern — Workflow & BPM Research |
 | **Tipe Proyek** | Proyek Riset Internal (R&D) |
+| **Tahun** | 2024-2025 |
+| **Tanggal Audit** | 2026-02-26 |
 
 ---
 
-## 🎯 Tujuan Project
+## 🏢 Konteks Perusahaan
+
+| Aspek | Detail |
+|-------|--------|
+| **Perusahaan** | PT. Len Industri (epersero) |
+| **Divisi** | IT Governance & Development |
+| **Penulis** | Alifito Rabbani Cahyono |
+| **Peran** | Backend Engineer Intern — Workflow & BPM Research |
+| **Tipe Proyek** | Proyek Riset Internal (R&D) |
+| **Tahun** | 2024-2025 |
+
+---
+
+## � Tujuan Project
 
 1. **Perbandingan Teknis** — Mengukur perbedaan kompleksitas kode (LOC), maintainability, dan skalabilitas antar pendekatan workflow
 2. **Evaluasi BPM Engine** — Memahami kapan BPMN engine diperlukan vs manual workflow
 3. **Rekomendasi Enterprise** — Memberikan insight untuk pemilihan solusi workflow di lingkungan enterprise
 4. **Proof of Concept** — Mendemonstrasikan implementasi nyata dari setiap pendekatan
+5. **Pembelajaran Internal** — Menjadi bahan ajar untuk tim developer di PT. Len Industri
 
 ---
 
@@ -48,30 +66,40 @@ leave-workflow-comparison/
 ├── manual-version/                    # Versi 1: Manual Workflow
 │   ├── backend/                      # Spring Boot application
 │   │   ├── src/main/java/.../
-│   │   └── pom.xml
-│   └── frontend/                     # React + TypeScript
+│   │   ├── pom.xml
+│   │   └── src/main/resources/
+│   │       └── application.properties
+│   └── frontend/                     # React + TypeScript + Vite
 │       ├── src/
+│       │   ├── pages/
+│       │   ├── services/
+│       │   └── main.tsx
 │       └── package.json
 │
 ├── flowable-version/                 # Versi 2: Flowable BPM
 │   ├── backend/                      # Spring Boot + Flowable
 │   │   ├── src/main/java/.../
-│   │   └── pom.xml
-│   ├── frontend/                     # React + TypeScript
+│   │   ├── pom.xml
+│   │   └── src/main/resources/
+│   │       └── application.properties
+│   ├── frontend/                     # React + TypeScript + Vite
 │   │   ├── src/
 │   │   └── package.json
 │   └── bpmn/                         # BPMN definition files
 │       └── leave-approval.bpmn20.xml
 │
-├── deboot-version/                   # Versi 3: Deboot Framework
-│   ├── backend/                      # Spring Boot + Deboot
+├── deboot-version/                   # Versi 3: Deboot (Simplified Flowable)
+│   ├── backend/                      # Spring Boot + Flowable
 │   │   ├── src/main/java/.../
-│   │   └── pom.xml
-│   ├── frontend/                     # React + TypeScript
-│   │   ├── src/
-│   │   └── package.json
-│   └── bpmn/                         # BPMN definition files
-│       └── leave-approval.bpmn20.xml
+│   │   ├── pom.xml
+│   │   └── src/main/resources/
+│   │       └── application.properties
+│   └── frontend/                     # React + TypeScript + Vite
+│       ├── src/
+│       │   ├── pages/
+│       │   ├── services/
+│       │   └── main.tsx
+│       └── package.json
 │
 ├── docs/                             # Dokumentasi (Bahasa Indonesia)
 │   ├── arsitektur.md
@@ -82,8 +110,24 @@ leave-workflow-comparison/
 │   ├── analisis-enterprise.md
 │   └── perbandingan.md
 │
-└── README.md                         # Dokumen ini
+├── README.md                         # Dokumen ini
+└── .gitignore
 ```
+
+---
+
+## 📊 Statistik LOC (Lines of Code)
+
+| Versi | Backend (Java) | Frontend (TS/TSX) | BPMN/XML | Total |
+|-------|---------------|-------------------|----------|-------|
+| **Manual** | 1,731 LOC | 1,364 LOC | - | **3,095 LOC** |
+| **Flowable** | 1,563 LOC | 1,364 LOC | 96 LOC | **3,023 LOC** |
+| **Deboot** | 1,482 LOC | 1,364 LOC | - | **2,846 LOC** |
+
+### Analisis LOC:
+- **Deboot Version** memiliki LOC terendah karena menggunakan pendekatan service yang lebih ringkas
+- **Manual Version** memiliki LOC tertinggi karena implementasi state machine secara eksplisit
+- **Frontend** identik untuk semua versi karena UI tidak bergantung pada pendekatan workflow
 
 ---
 
@@ -158,18 +202,28 @@ Semua versi mengimplementasikan **use case identik** untuk memastikan perbanding
 |-------|------|-----------|
 | id | UUID | Primary key |
 | employeeName | String | Nama pegawail |
-| leaveType | Enum | Jenis cuti (ANNUAL, SICK, PERSONAL) |
+| employeeId | String | ID Pegawai |
+| department | String | Departemen |
+| leaveType | Enum | Jenis cuti (ANNUAL, SICK, PERSONAL, MATERNITY) |
 | startDate | LocalDate | Tanggal mulai cuti |
 | endDate | LocalDate | Tanggal akhir cuti |
 | reason | String | Alasan pengajuan cuti |
 | status | Enum | Status pengajuan |
+| managerComment | String | Komentar manager |
+| hrComment | String | Komentar HR |
+| approvedByManager | String | Nama manager yang approve |
+| approvedByHR | String | Nama HR yang approve |
+| managerApprovalDate | LocalDateTime | Waktu approval manager |
+| hrApprovalDate | LocalDateTime | Waktu approval HR |
+| totalDays | Integer | Total hari cuti |
+| workflowInstanceId | String | ID proses workflow (Flowable) |
 | createdAt | Timestamp | Waktu pembuatan |
 | updatedAt | Timestamp | Waktu terakhir update |
 
 ### Status Enum
 - `PENDING` — Menunggu approval manager
 - `MANAGER_APPROVED` — Approved manager, menunggu HR
-- `MANAGER_REJECTED` — Ditolak manager
+- `MANAGER_REJECTED` — Ditolak manager (final)
 - `HR_APPROVED` — Approved HR (final)
 - `HR_REJECTED` — Ditolak HR (final)
 
@@ -199,7 +253,7 @@ cd manual-version/backend
 ```bash
 cd manual-version/frontend
 npm install
-npm start
+npm run dev
 ```
 
 ---
@@ -217,7 +271,7 @@ cd flowable-version/backend
 ```bash
 cd flowable-version/frontend
 npm install
-npm start
+npm run dev
 ```
 
 ---
@@ -235,7 +289,7 @@ cd deboot-version/backend
 ```bash
 cd deboot-version/frontend
 npm install
-npm start
+npm run dev
 ```
 
 ---
@@ -245,12 +299,47 @@ npm start
 | Aspek | Manual | Flowable | Deboot |
 |-------|--------|----------|--------|
 | **Kompleksitas Kode** | Tinggi | Medium | Rendah |
-| **LOC (Backend)** | ~1500 | ~1800 | ~1200 |
-| **Fleksibilitas** | Penuh | Tinggi | Medium |
-| **Visualisasi** | ❌ | ✅ | ✅ |
+| **LOC (Backend)** | 1,731 | 1,563 | 1,482 |
+| **Fleksibilitas** | Penuh | Tinggi | Tinggi |
+| **Visualisasi** | ❌ | ✅ | ❌ |
 | **History Tracking** | Manual | Otomatis | Otomatis |
 | **Learning Curve** | Rendah | Tinggi | Medium |
 | **Setup Effort** | Minimal | Medium | Medium |
+| **BPMN Support** | ❌ | ✅ | ✅ (via Flowable) |
+| **Dependency** | Spring Boot only | Flowable 6.8.0 | Flowable 6.8.0 |
+
+### Detail Fitur per Versi
+
+#### Manual Version Features
+- ✅ JWT Authentication & Authorization
+- ✅ User Registration & Login
+- ✅ Submit Leave Request
+- ✅ Manager Approval/Rejection
+- ✅ HR Approval/Rejection
+- ✅ State Machine (Enum-based)
+- ✅ Manual Audit Trail
+- ✅ Role-based Access Control (Employee, Manager, HR)
+
+#### Flowable Version Features
+- ✅ JWT Authentication & Authorization
+- ✅ User Registration & Login  
+- ✅ Submit Leave Request (with BPMN process)
+- ✅ Manager Approval/Rejection (via Flowable Task)
+- ✅ HR Approval/Rejection (via Flowable Task)
+- ✅ BPMN 2.0 Process Definition
+- ✅ Automatic History Tracking
+- ✅ Process Variables
+- ✅ Candidate Groups (managers, hr)
+
+#### Deboot Version Features
+- ✅ JWT Authentication & Authorization
+- ✅ User Registration & Login
+- ✅ Submit Leave Request (direct Flowable)
+- ✅ Manager Approval/Rejection (via TaskService)
+- ✅ HR Approval/Rejection (via TaskService)
+- ✅ Service-based Workflow (no BPMN XML)
+- ✅ Automatic History (via Flowable)
+- ✅ Direct Flowable API Usage
 
 ---
 
@@ -267,12 +356,38 @@ Semua dokumentasi tersedia di folder [`docs/`](docs/):
 | [`lisensi-dan-pricing.md`](docs/lisensi-dan-pricing.md) | Analisis lisensi dan harga |
 | [`analisis-enterprise.md`](docs/analisis-enterprise.md) | Analisis aspek enterprise |
 | [`perbandingan.md`](docs/perbandingan.md) | Matrix perbandingan lengkap |
+| [`audit-komprehensif.md`](docs/audit-komprehensif.md) | **BARU** - Audit lengkap semua versi |
 
 ---
 
-## 📸 Screenshot Placeholder
+## 🔍 Audit Ringkasan
 
-> _Screenshot aplikasi akan ditambahkan setelah deployment berhasil._
+### Manual Version
+- **Kompleksitas**: Tinggi
+- **LOC Backend**: 1,731
+- **Kelebihan**: Tidak ada dependency eksternal, kontrol penuh, mudah dipahami
+- **Kekurangan**: Tidak ada visualisasi, audit trail manual, scaling terbatas
+- **Cocok untuk**: Pembelajaran, proyek sederhana, budget terbatas
+
+### Flowable Version  
+- **Kompleksitas**: Medium
+- **LOC Backend**: 1,563
+- **Kel优点**: Visual workflow, audit trail otomatis, BPMN standar industri
+- **Kekurangan**: Kurva pembelajaran tinggi, overhead untuk proyek kecil
+- **Cocok untuk**: Enterprise, compliance ketat, visualisasi penting
+
+### Deboot Version
+- **Kompleksitas**: Rendah
+- **LOC Backend**: 1,482
+- **Kelebihan**: Tidak perlu belajar BPMN, boilerplate sedikit, pengembangan cepat
+- **Kekurangan**: Tidak ada visualisasi, vendor lock-in ke Flowable
+- **Cocok untuk**: MVP/POC, tim kecil, pengembangan cepat
+
+---
+
+## 📸 Screenshots
+
+Screenshot aplikasi dapat dilihat di dokumentasi masing-masing versi.
 
 ---
 
@@ -292,40 +407,112 @@ echo "Frontend: $(find . \( -name '*.ts' -o -name '*.tsx' \) | grep -v node_modu
 
 ---
 
-## 💡 Insight Akademik & Industri
+## 🛠️ Tech Stack
+
+### Backend
+
+| Komponen | Manual Version | Flowable Version | Deboot Version |
+|----------|----------------|------------------|----------------|
+| Framework | Spring Boot 3.2.0 | Spring Boot 3.2.0 | Spring Boot 3.2.0 |
+| BPM Engine | ❌ | Flowable 6.8.0 | Flowable 6.8.0 |
+| Database | PostgreSQL | PostgreSQL | PostgreSQL |
+| ORM | Spring Data JPA | Spring Data JPA | Spring Data JPA |
+| Security | Spring Security + JWT | Spring Security + JWT | Spring Security + JWT |
+| Build Tool | Maven | Maven | Maven |
+| Java Version | 17+ | 17+ | 17+ |
+
+### Frontend (Identik untuk semua versi)
+
+| Komponen | Semua Versi |
+|----------|-------------|
+| Framework | React 18 |
+| Language | TypeScript |
+| Build Tool | Vite |
+| Styling | Tailwind CSS |
+| HTTP Client | Axios |
+| Routing | React Router |
+| Date Handling | date-fns |
+| Notifications | react-hot-toast |
+
+---
+
+## 🔑 Default Credentials
+
+Setelah menjalankan aplikasi, berikut akun yang dapat digunakan untuk testing:
+
+| Role | Username | Password | Port |
+|------|----------|----------|------|
+| Employee | employee1 | password123 | 8100/8200/8300 |
+| Employee | employee2 | password123 | 8100/8200/8300 |
+| Employee | employee3 | password123 | 8100/8200/8300 |
+| Manager | manager1 | password123 | 8100/8200/8300 |
+| Manager | manager2 | password123 | 8100/8200/8300 |
+| HR | hr1 | password123 | 8100/8200/8300 |
+| HR | hr2 | password123 | 8100/8200/8300 |
+
+---
+
+## 💡 Rekomendasi Penggunaan
+
+### Berdasarkan Jenis Organisasi
+
+| Jenis Organisasi | Rekomendasi | Alasan |
+|------------------|-------------|--------|
+| Startup (< 10 orang) | **Manual** | Simpel, biaya rendah, tidak perlu expertise khusus |
+| SMB (10-100 orang) | **Deboot** | Seimbang antara fitur dan kesederhanaan |
+| Enterprise (> 100 orang) | **Flowable** | Skalabilitas, compliance, visualisasi |
+
+### Berdasarkan Kebutuhan
+
+| Kebutuhan | Rekomendasi |
+|-----------|-------------|
+| **Pembelajaran workflow** | Manual (untuk memahami dasar) |
+| **Pembelajaran BPMN** | Flowable (untuk memahami BPMN) |
+| **MVP/POC cepat** | Deboot |
+| **Visualisasi penting** | Flowable |
+| **Budget sangat terbatas** | Manual |
+| **Compliance ketat** | Flowable Enterprise |
+| **Tim kecil** | Manual atau Deboot |
 
 ### Kapan Manual Workflow?
 - Proses bisnis sederhana dan stabil
 - Tim kecil dengan kebutuhan terbatas
 - Budget terbatas untuk lisensi
+- Tidak memerlukan visualisasi workflow
+- Ingin kontrol penuh atas logika bisnis
 
 ### Kapan Flowable BPM?
 - Proses bisnis kompleks dengan banyak variasi
 - Perlu visualisasi dan audit trail
 - Kebutuhan compliance dan governance
 - Skala enterprise
+- Tim yang memiliki keahlian BPMN
+- Memerlukan process mining capabilities
 
 ### Kapan Deboot Framework?
-- Ingin manfaat BPM tanpa kompleksitas Flowable
+- Ingin manfaat BPM tanpa kompleksitas Flowable penuh
 - Tim dengan skill terbatas di BPMN
 - Pengembangan cepat dengan pattern yang sudah disediakan
+- Perlu skalabilitas Flowable tanpa belajar BPMN XML
+- Ingin service-based approach yang lebih familiar bagi developer
 
 ---
 
 ## ⚠️ Disclaimer
 
-> Proyek ini dibuat sebagai **proyek riset internal** selama magang di PT. Len Industri (Persero).  
+> Proyek ini dibuat sebagai **proyek riset internal** selama magang di PT. Len Industri (epersero).  
 > Tujuan utama adalah pembelajaran dan penelitian, bukan untuk produksi.  
-> Deboot Framework diasumsikan sebagai framework akselerator di atas Flowable untuk tujuan perbandingan.
+> Deboot Framework dalam konteks ini diimplementasikan sebagai pendekatan service-based di atas Flowable (bukan framework eksternal), untuk menunjukkan bagaimana Flowable dapat digunakan dengan cara yang lebih sederhana.
 
 ---
 
 ## 📄 Lisensi
 
 Proyek ini bersifat **internal** dan hanya untuk tujuan riset dan pembelajaran.  
-Konten tidak untuk didistribusikan tanpa izin dari PT. Len Industri (Persero).
+Konten tidak untuk didistribusikan tanpa izin dari PT. Len Industri (epersero).
 
 ---
 
 **Dibuat oleh Alifito Rabbani Cahyono**  
-**PT. Len Industri (Persero) — Backend Engineer Intern**
+**PT. Len Industri (epersero) — Backend Engineer Intern**  
+**Tahun: 2024-2025**

@@ -8,7 +8,7 @@ import lombok.*;
  * Standard response format for all API endpoints.
  * 
  * @author Alifito Rabbani Cahyono
- * @company PT. Len Industri (opersero)
+ * @company PT. Len Industri (Persero)
  */
 @Getter
 @Setter

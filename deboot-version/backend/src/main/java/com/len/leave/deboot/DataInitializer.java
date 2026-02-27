@@ -28,11 +28,10 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        if (leaveRequestRepository.count() > 0) {
-            log.info("Database already contains data, skipping initialization");
-            return;
-        }
-
+        // Always initialize sample data for demo purposes
+        // Clear existing data and create fresh sample data
+        leaveRequestRepository.deleteAll();
+        
         log.info("Initializing sample data for Deboot Version...");
 
         List<LeaveRequest> sampleRequests = new ArrayList<>();

@@ -25,6 +25,9 @@ Dokumen ini melaporkan perhitungan Lines of Code (LOC) untuk setiap versi implem
 - Semua file `.ts` dan `.tsx` di bawah `src/`
 - Exclude: `node_modules/`, `build/`
 
+**BPMN (XML):**
+- Semua file `.xml` di bawah folder `bpmn/`
+
 ### 2.2 Command yang Digunakan
 
 ```bash
@@ -33,6 +36,9 @@ find . -name "*.java" -path "*/src/*" | xargs wc -l | tail -1
 
 # Frontend LOC
 find . -name "*.ts" -o -name "*.tsx" | grep -v node_modules | xargs wc -l | tail -1
+
+# BPMN LOC
+find . -name "*.xml" -path "*/bpmn/*" | xargs wc -l | tail -1
 ```
 
 ---
@@ -41,73 +47,98 @@ find . -name "*.ts" -o -name "*.tsx" | grep -v node_modules | xargs wc -l | tail
 
 ### 3.1 Manual Version
 
-| Komponen | LOC |
-|----------|-----|
-| **Backend** | |
-| Entity (LeaveRequest, LeaveStatus, LeaveType, AuditLog) | ~250 |
-| Repository | ~80 |
-| Service (dengan state machine logic) | ~300 |
-| Controller | ~200 |
-| DTOs | ~100 |
-| Exception Handling | ~80 |
-| AOP/Aspects | ~60 |
-| **Backend Total** | **~1,070** |
-| **Frontend** | |
-| Pages (Dashboard, LeaveForm, etc.) | ~400 |
-| Services/API | ~100 |
-| Components | ~100 |
-| **Frontend Total** | **~600** |
-| **TOTAL** | **~1,670** |
+| Komponen | File Count | LOC |
+|----------|-----------|-----|
+| **Backend (Java)** | | |
+| Entity | 4 | ~300 |
+| Repository | 2 | ~200 |
+| Service | 1 | ~400 |
+| Controller | 1 | ~250 |
+| DTOs | 3 | ~250 |
+| Exception | 4 | ~200 |
+| AOP/Aspects | 1 | ~100 |
+| Config | 1 | ~31 |
+| DataInitializer | 1 | ~100 |
+| **Backend Total** | **18** | **1,731** |
+| **Frontend (TS/TSX)** | | |
+| Pages | 4 | ~800 |
+| Services | 1 | ~100 |
+| App & Main | 2 | ~200 |
+| CSS | 1 | ~264 |
+| **Frontend Total** | **8** | **1,364** |
+| **TOTAL** | **26** | **3,095** |
 
 ### 3.2 Flowable Version
 
-| Komponen | LOC |
-|----------|-----|
-| **Backend** | |
-| Entity | ~200 |
-| Repository | ~70 |
-| Service (dengan Flowable integration) | ~350 |
-| Controller | ~200 |
-| DTOs | ~100 |
-| Exception Handling | ~80 |
-| **Backend Total** | **~1,000** |
-| **Frontend** | |
-| Pages | ~400 |
-| Services/API | ~100 |
-| Components | ~100 |
-| **Frontend Total** | **~600** |
-| **BPMN Files** | |
-| leave-approval.bpmn20.xml | ~80 |
-| **TOTAL** | **~1,680** |
+| Komponen | File Count | LOC |
+|----------|-----------|-----|
+| **Backend (Java)** | | |
+| Entity | 4 | ~280 |
+| Repository | 2 | ~200 |
+| Service | 1 | ~450 |
+| Controller | 1 | ~200 |
+| DTOs | 3 | ~200 |
+| Config | 2 | ~133 |
+| DataInitializer | 1 | ~100 |
+| **Backend Total** | **14** | **1,563** |
+| **Frontend (TS/TSX)** | | |
+| Pages | 4 | ~800 |
+| Services | 1 | ~100 |
+| App & Main | 2 | ~200 |
+| CSS | 1 | ~264 |
+| **Frontend Total** | **8** | **1,364** |
+| **BPMN Files** | | |
+| leave-approval.bpmn20.xml | 1 | 96 |
+| **TOTAL** | **23** | **3,023** |
 
 ### 3.3 Deboot Version
 
-| Komponen | LOC |
-|----------|-----|
-| **Backend** | |
-| Entity | ~200 |
-| Repository | ~70 |
-| Service (dengan Deboot annotations) | ~250 |
-| Controller | ~200 |
-| DTOs | ~100 |
-| Exception Handling | ~80 |
-| **Backend Total** | **~900** |
-| **Frontend** | |
-| Pages | ~400 |
-| Services/API | ~100 |
-| Components | ~100 |
-| **Frontend Total** | **~600** |
-| **TOTAL** | **~1,500** |
+| Komponen | File Count | LOC |
+|----------|-----------|-----|
+| **Backend (Java)** | | |
+| Entity | 4 | ~280 |
+| Repository | 2 | ~220 |
+| Service | 1 | ~350 |
+| Controller | 1 | ~200 |
+| DTOs | 3 | ~200 |
+| Config | 2 | ~132 |
+| DataInitializer | 1 | ~100 |
+| **Backend Total** | **14** | **1,482** |
+| **Frontend (TS/TSX)** | | |
+| Pages | 4 | ~800 |
+| Services | 1 | ~100 |
+| App & Main | 2 | ~200 |
+| CSS | 1 | ~264 |
+| **Frontend Total** | **8** | **1,364** |
+| **TOTAL** | **22** | **2,846** |
 
 ---
 
 ## 4. Tabel Perbandingan LOC
 
+### 4.1 Ringkasan Total LOC
+
 | Versi | Backend LOC | Frontend LOC | BPMN LOC | Total LOC |
 |-------|-------------|--------------|----------|-----------|
-| Manual | 1,070 | 600 | 0 | 1,670 |
-| Flowable | 1,000 | 600 | 80 | 1,680 |
-| Deboot | 900 | 600 | 0 | 1,500 |
+| Manual | 1,731 | 1,364 | - | **3,095** |
+| Flowable | 1,563 | 1,364 | 96 | **3,023** |
+| Deboot | 1,482 | 1,364 | - | **2,846** |
+
+### 4.2 Perbandingan Backend Saja
+
+| Versi | Backend LOC | Persentase |
+|-------|-------------|------------|
+| Manual | 1,731 | 100% |
+| Flowable | 1,563 | 90.3% |
+| Deboot | 1,482 | 85.6% |
+
+### 4.3 Persentase Reduction dari Manual
+
+| Versi | LOC Reduction | Persentase |
+|-------|----------------|------------|
+| Manual | - | Baseline |
+| Flowable | 168 LOC | 9.7% |
+| Deboot | 249 LOC | 14.4% |
 
 ---
 
@@ -116,44 +147,80 @@ find . -name "*.ts" -o -name "*.tsx" | grep -v node_modules | xargs wc -l | tail
 ### 5.1 Mengapa Manual Version Lebih Tinggi?
 
 1. **State Machine Logic**: Implementasi manual memerlukan logika if-else yang eksplisit untuk setiap transisi status
-2. **Audit Logging**: Implementasi manual memerlukan kode tambahan untuk audit trail
+2. **Audit Logging**: Implementasi manual memerlukan kode tambahan untuk audit trail manual
 3. **Validasi**: Validasi state transition memerlukan pengecekan eksplisit
+4. **Exception Handling**: Lebih banyak kode untuk menangani invalid state transitions
+5. **AOP/Aspects**: Adanya LoggingAspect untuk logging
 
-### 5.2 Mengapa Flowable Version Sedikit Lebih Tinggi?
+### 5.2 Mengapa Flowable Version Sedikit Lebih Rendah?
 
-1. **BPMN Configuration**: File BPMN XML memerlukan tambahan ~80 LOC
-2. **Service Integration**: Integrasi dengan Flowable services memerlukan kode tambahan
+1. **Engine-based Logic**: Logika workflow di-handle oleh Flowable engine
+2. **BPMN Configuration**: File BPMN XML memindahkan beberapa logika ke konfigurasi
+3. **Service Integration**: Integrasi dengan Flowable services相对 lebih ringkas
 
-### 5.3 Mengapa Deboot Version Lebih Rendah?
+### 5.3 Mengapa Deboot Version Paling Rendah?
 
-1. **Annotation-Driven**: Deboot menghilangkan kebutuhan BPMN XML
-2. **Boilerplate Reduction**: Annotations menyederhanakan kode
-3. **Convention over Configuration**: Pattern sudah disediakan oleh framework
+1. **No BPMN XML**: Deboot tidak memerlukan file definisi proses BPMN
+2. **Service-based**: Semua logika workflow ada di service class
+3. **Direct Flowable Usage**: Menggunakan Flowable secara langsung tanpa abstraksi额外
+4. **Minimal Boilerplate**: Tidak ada konfigurasi BPMN yang perlu di-maintain
 
 ---
 
 ## 6. Grafik Perbandingan
 
+### 6.1 Total LOC Comparison
+
 ```
-LOC Comparison
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Manual     ████████████████████████████████████████████ 1,670
-Flowable  ████████████████████████████████████████████ 1,680
-Deboot    ███████████████████████████████████████████ 1,500
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-           0    400    800   1200   1600   2000
+Total LOC Comparison (semua komponen)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Manual     ██████████████████████████████████████████████████████ 3,095
+Flowable  █████████████████████████████████████████████████████ 3,023
+Deboot    ███████████████████████████████████████████████████ 2,846
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           0    600   1,200   1,800   2,400   3,000   3,600
+```
+
+### 6.2 Backend LOC Comparison
+
+```
+Backend LOC Comparison
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Manual     █████████████████████████████████████████████████████ 1,731
+Flowable  ██████████████████████████████████████████████████ 1,563
+Deboot    █████████████████████████████████████████████████ 1,482
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+           0    400    800   1,200   1,600   2,000
+```
+
+### 6.3 Perbandingan Komponen Backend
+
+```
+Komponen           Manual   Flowable   Deboot
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Entity               300       280       280
+Repository           200       200       220
+Service              400       450       350
+Controller           250       200       200
+DTOs                 250       200       200
+Exception/Other      300       233       232
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TOTAL             1,731     1,563     1,482
 ```
 
 ---
 
 ## 7. Kesimpulan
 
-1. **Deboot Version** memiliki LOC terendah (~1,500), menunjukkan bahwa framework ini efektif mengurangi boilerplate code
+1. **Deboot Version** memiliki LOC terendah (2,846), menunjukkan bahwa pendekatan service-based efektif mengurangi kompleksitas kode
 
-2. **Manual Version** dan **Flowable Version** memiliki LOC yang hampir sama (~1,670-1,680), namun dengan karakteristik berbeda:
-   - Manual: Lebih banyak kode Java untuk state machine
-   - Flowable: Lebih banyak konfigurasi BPMN
+2. **Manual Version** memiliki LOC tertinggi (3,095) karena implementasi state machine secara eksplisit dengan if-else
 
-3. **Perbedaan Frontend**: Tidak ada perbedaan signifikan karena frontend memiliki struktur dan fitur yang sama untuk semua versi
+3. **Flowable Version** berada di tengah (3,023), dengan tambahan 96 LOC untuk file BPMN XML
 
-4. **Rekomendasi**: Untuk proyek dengan kompleksitas rendah-sedang, Deboot dapat mempercepat development. Untuk proyek enterprise besar, Flowable memberikan fleksibilitas lebih.
+4. **Perbedaan Frontend**: Tidak ada perbedaan signifikan karena frontend memiliki struktur dan fitur yang sama untuk semua versi
+
+5. **Rekomendasi**: 
+   - Untuk proyek dengan kompleksitas rendah-sedang, Deboot dapat mempercepat development
+   - Untuk proyek enterprise besar, Flowable memberikan fleksibilitas dan visualisasi lebih
+   - Untuk pembelajaran dan understanding dasar, Manual version sangat baik

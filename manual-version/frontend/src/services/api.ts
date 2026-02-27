@@ -1,6 +1,13 @@
 import axios from 'axios';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = 'http://localhost:8100/api';
+
+// Get token from localStorage
+const getToken = () => localStorage.getItem('token');
+const getUser = () => {
+  const userStr = localStorage.getItem('user');
+  return userStr ? JSON.parse(userStr) : null;
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -9,7 +16,72 @@ const api = axios.create({
   },
 });
 
+// Add token to requests
+api.interceptors.request.use((config) => {
+  const token = getToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// Handle response errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Types
+export interface UserRole {
+  role: 'EMPLOYEE' | 'MANAGER' | 'HR';
+}
+
+export interface User {
+  id: string;
+  username: string;
+  email: string;
+  fullName: string;
+  employeeId?: string;
+  department?: string;
+  role: 'EMPLOYEE' | 'MANAGER' | 'HR';
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface LoginRequest {
+  username: string;
+  password: string;
+}
+
+export interface RegisterRequest {
+  username: string;
+  password: string;
+  email: string;
+  fullName: string;
+  employeeId?: string;
+  department?: string;
+  role: 'EMPLOYEE' | 'MANAGER' | 'HR';
+}
+
+export interface AuthResponse {
+  id: string;
+  username: string;
+  email: string;
+  fullName: string;
+  employeeId?: string;
+  department?: string;
+  role: 'EMPLOYEE' | 'MANAGER' | 'HR';
+  token: string;
+  loginTime: string;
+}
+
 export interface LeaveRequest {
   id: string;
   employeeName: string;
@@ -55,7 +127,19 @@ export interface ApiResponse<T> {
   timestamp: number;
 }
 
-// API Functions
+// Auth API Functions
+export const authApi = {
+  login: (data: LoginRequest) =>
+    api.post<ApiResponse<AuthResponse>>('/auth/login', data),
+
+  register: (data: RegisterRequest) =>
+    api.post<ApiResponse<AuthResponse>>('/auth/register', data),
+
+  getCurrentUser: () =>
+    api.get<ApiResponse<User>>('/auth/me'),
+};
+
+// Leave API Functions
 export const leaveApi = {
   // Submit new leave request
   submitRequest: (data: CreateLeaveRequest) =>
@@ -97,5 +181,19 @@ export const leaveApi = {
   getAuditLogs: (id: string) =>
     api.get<ApiResponse<any>>(`/leave-requests/${id}/audit-logs`),
 };
+
+// Utility functions
+export const setAuth = (response: AuthResponse) => {
+  localStorage.setItem('token', response.token);
+  localStorage.setItem('user', JSON.stringify(response));
+};
+
+export const clearAuth = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
+};
+
+export const isAuthenticated = () => !!getToken();
+export const getCurrentUser = () => getUser();
 
 export default api;

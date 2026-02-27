@@ -35,8 +35,15 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
     try {
       setLoading(true);
       const response = await leaveApi.getAllRequests(0, 100);
-      if (response.data.data && response.data.data.content) {
-        setRequests(response.data.data.content);
+      // Handle both Page format (manual) and List format (flowable/deboot)
+      if (response.data.data) {
+        if (response.data.data.content) {
+          // Page format (manual version)
+          setRequests(response.data.data.content);
+        } else if (Array.isArray(response.data.data)) {
+          // List format (flowable/deboot version)
+          setRequests(response.data.data);
+        }
       }
     } catch (error) {
       toast.error('Gagal memuat data pengajuan cuti');

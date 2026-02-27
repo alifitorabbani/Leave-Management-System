@@ -16,7 +16,7 @@ import java.util.UUID;
  * Data Transfer Object for creating new leave requests.
  * 
  * @author Alifito Rabbani Cahyono
- * @company PT. Len Industri (opersero)
+ * @company PT. Len Industri (Persero)
  */
 public class LeaveRequestDTO {
 
@@ -88,8 +88,6 @@ public class LeaveRequestDTO {
         private String approvedBy;
 
         private String role;
-        
-        private String taskId;
     }
 
     @Getter
@@ -106,7 +104,5 @@ public class LeaveRequestDTO {
 
         @NotBlank(message = "Updated by wajib diisi")
         private String updatedBy;
-        
-        private String taskId;
     }
 }
