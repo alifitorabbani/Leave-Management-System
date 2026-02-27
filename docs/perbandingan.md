@@ -31,7 +31,7 @@
 | **Enterprise** | | | |
 | Scalability | Rendah | Tinggi | Tinggi |
 | Compliance | Manual | Built-in | Built-in |
-| Support | Internal | Community/Enterprise | Vendor |
+| Support | Internal | Community/Enterprise | **Flowable** (via library) |
 | **Integration** | | | |
 | REST API | ✅ | ✅ | ✅ |
 | Database | PostgreSQL | PostgreSQL | PostgreSQL |
@@ -214,3 +214,20 @@ Proyek ini dibuat untuk tujuan riset dan pembelajaran. Untuk implementasi produc
 - Frontend identik untuk semua versi
 - Perbedaan utama ada di backend (workflow implementation)
 - Deboot diimplementasikan sebagai service-based approach, bukan framework terpisah
+
+---
+
+### Penjelasan: Apa itu "Vendor" dalam tabel di atas?
+
+Dalam konteks perbandingan software/workflow ini, "Vendor" refers ke:
+
+| Versi | Penjelasan Vendor |
+|-------|-------------------|
+| **Manual** | Tidak ada vendor (implementasi internal oleh tim sendiri) |
+| **Flowable** | Vendor = **Flowable GmbH** (perusahaan yang membuat Flowable BPM engine). Jika menggunakan Enterprise Edition, ada kontrak support resmi. |
+| **Deboot** | Deboot adalah pendekatan **service-based** yang menggunakan Flowable sebagai library. Tidak ada "vendor" khusus karena ini adalah custom implementation. Support yang didapat sama dengan Flowable Community (via forum/documentation). |
+
+**Ringkasan Support:**
+- **Manual**: Support internal (tim internal sendiri)
+- **Flowable**: Support dari Flowable GmbH (Community via forum / Enterprise via kontrak)
+- **Deboot**: Support dari Flowable GmbH karena menggunakan Flowable library (sama seperti Flowable Community Edition)
