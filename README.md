@@ -737,7 +737,6 @@ Berikut ringkasan kesimpulan dari setiap dokumen dalam folder `docs/`:
 ## 📄 Lisensi
 
 Proyek ini bersifat **internal** dan hanya untuk tujuan riset dan pembelajaran.  
-Konten tidak untuk didistribusikan tanpa izin dari PT. Len Industri (Persero).
 
 ---
 
