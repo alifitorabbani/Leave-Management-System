@@ -172,28 +172,7 @@ Dokumen ini menganalisis aspek-aspek enterprise dari setiap pendekatan workflow 
 
 ---
 
-## 5. Pertimbangan Khusus untuk PT. Len Industri
-
-### 5.1 Konteks Organisasi
-
-Sebagai BUMN di bidang teknologi dan industri pertahanan, PT. Len Industri memiliki pertimbangan khusus:
-
-| Aspek | Pertimbangan |
-|-------|--------------|
-| **Compliance** | Kebutuhan compliance tinggi (BUMN) |
-| **Security** | Keamanan data menjadi prioritas |
-| **Support** | Butuh vendor support yang可靠 |
-| **Budget** | Budget yang dialokasikan untuk R&D |
-
-### 5.2 Rekomendasi untuk PT. Len Industri
-
-1. **Untuk Proyek Internal R&D**: Manual atau Deboot untuk pembelajaran
-2. **Untuk Production System**: Flowable Enterprise untuk compliance
-3. **Untuk Proof of Concept**: Deboot untuk kecepatan development
-
----
-
-## 6. Kesimpulan
+## 5. Kesimpulan
 
 Berdasarkan analisis enterprise:
 
