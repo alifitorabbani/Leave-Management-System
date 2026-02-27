@@ -522,6 +522,124 @@ Untuk memahami perbedaan ketiga pendekatan ini, berikut analogi yang dapat memba
 
 **Garis bawahi**: Tidak ada yang lebih baik atau lebih buruk - semuanya tergantung konteks dan kebutuhan!
 
+---
+
+## 🔄 Code-based vs Web Modeler: Perbedaan Pendekatan
+
+### Apa itu Flowable Web Modeler?
+
+Flowable menyediakan **Flowable Modeler** (web-based) yang merupakan aplikasi web untuk membuat dan mengelola workflow secara visual. Ini adalah pendekatan GUI yang berbeda dari yang kita implementasikan di proyek ini.
+
+### Perbandingan Pendekatan
+
+| Aspek | Code-based (Proyek Ini) | Web Modeler |
+|-------|-------------------------|-------------|
+| **Pendekatan** | Tulis kode Java/XML | Drag & drop di browser |
+| **Visualisasi** | File BPMN XML | GUI visual flowchart |
+| **Team Collaboration** | Via version control (Git) | Real-time collaboration |
+| **Deployment** | Build & restart aplikasi | Klik "Deploy" di web |
+| **Versioning** | Git-based | Built-in versioning |
+| **Learning Curve** | Tinggi (harus coding) | Rendah (GUI) |
+
+### Perbandingan Detail: Flowable (BPMN) vs Deboot vs Web Modeler
+
+| Fitur | Flowable (BPMN XML) | Deboot (Code) | Web Modeler |
+|-------|---------------------|--------------|-------------|
+| **Definisi Workflow** | File .bpmn20.xml | Kode Java Service | GUI Visual |
+| **Penggunaan** | | | |
+| Desain Proses | Manual edit XML | - | Drag & Drop |
+| Deploy | Via RepositoryService | Auto-start | Klik button |
+| Ubah Proses | Edit file + rebuild | Ubah kode + rebuild | Edit di web |
+| **Kelebihan** | | | |
+| Version Control | ✅ (text file) | ✅ | ❌ (database) |
+| Code Review | ✅ | ✅ | ❌ |
+| CI/CD Friendly | ✅ | ✅ | ❌ |
+| Easy Debugging | Medium | Easy | Sulit |
+| **Kekurangan** | | | |
+| Learning Curve | Tinggi | Medium | Rendah |
+| Visual Feedback | Perlu tool eksternal | ❌ | ✅ |
+| Kolaborasi Tim | Via Git | Via Git | Real-time |
+
+### Kapan Menggunakan Pendekatan Code-based?
+
+| Situasi | Rekomendasi |
+|---------|-------------|
+| Proses sederhana | Code-based (lebih cepat) |
+| Tim developer | Code-based |
+| CI/CD pipeline | Code-based |
+| Proses kompleks | Web Modeler |
+| Non-technical user | Web Modeler |
+| Perubahan frequent | Web Modeler |
+
+### Kapan Menggunakan Web Modeler?
+
+**Gunakan Web Modeler jika:**
+1. Tim mencakup business analyst non-technical
+2. Proses sering berubah-ubah
+3. Butuh visualisasi real-time
+4. Organisasi sudah memiliki infrastruktur Flowable
+5. Collaboration antar department penting
+
+**Gunakan Code-based jika:**
+1. Tim small & technical
+2. Proses sudah stabil
+3. Butuh CI/CD automation
+4. Version control penting
+5. Budget/ressource terbatas
+
+### Diagram Perbandingan Pendekatan
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                    FLOWABLE IMPLEMENTATION OPTIONS                  │
+├─────────────────────────────────────────────────────────────────────┤
+│                                                                     │
+│    ┌─────────────────────────────────────────────────────────┐      │
+│    │                  WEB MODELER (GUI)                      │      │
+│    │  ┌─────────┐  ┌─────────┐  ┌─────────┐  ┌─────────┐ │      │
+│    │  │ Design │  │ Deploy │  │ Monitor │  │  Edit   │ │      │
+│    │  │ (Drag) │──│(Click) │──│(Web UI) │──│(Visual) │ │      │
+│    │  └─────────┘  └─────────┘  └─────────┘  └─────────┘ │      │
+│    └─────────────────────────────────────────────────────────┘      │
+│                              │                                      │
+│                              ▼                                      │
+│    ┌─────────────────────────────────────────────────────────┐      │
+│    │                 CODE-BASED                             │      │
+│    │                                                          │      │
+│    │  ┌──────────────────┐    ┌────────────────────────┐  │      │
+│    │  │ FLOWABLE (BPMN)  │    │    DEBOOT (Service)    │  │      │
+│    │  │                  │    │                        │  │      │
+│    │  │ • .bpmn20.xml   │    │ • Java Service         │  │      │
+│    │  │ • XML Editor    │    │ • RuntimeService      │  │      │
+│    │  │ • BPMN Designer │    │ • TaskService          │  │      │
+│    │  └────────┬─────────┘    └───────────┬────────────┘  │      │
+│    │           │                           │                │      │
+│    └───────────▼──────────────────────────▼────────────────┘      │
+│                         │                                           │
+│                         ▼                                           │
+│              ┌─────────────────────┐                               │
+│              │   MAVEN BUILD       │                               │
+│              │   (mvn clean build) │                               │
+│              └─────────────────────┘                               │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Kesimpulan
+
+Di proyek ini, kita menggunakan **code-based approach** karena:
+
+1. **Tujuan Riset**: Memahami cara kerja Flowable secara internal
+2. **Pembelajaran**: Lebih baik untuk memahami mekanisme Flowable
+3. **Kontrol Penuh**: Dapat customisasi dengan tepat
+4. **Portabilitas**: mudah di-versioning dan di-CI/CD-kan
+
+Namun untuk production environment dengan tim yang mencakup business analyst, **Flowable Web Modeler** mungkin lebih tepat digunakan karena:
+
+1. Kemudahan kolaborasi
+2. Tidak perlu skill coding untuk perubahan minor
+3. Visualisasi langsung
+4. Deployment lebih cepat
+
 ### Kapan Manual Workflow?
 - Proses bisnis sederhana dan stabil
 - Tim kecil dengan kebutuhan terbatas
@@ -557,10 +675,9 @@ Untuk memahami perbedaan ketiga pendekatan ini, berikut analogi yang dapat memba
 ## 📄 Lisensi
 
 Proyek ini bersifat **internal** dan hanya untuk tujuan riset dan pembelajaran.  
-Konten tidak untuk didistribusikan tanpa izin dari PT. Len Industri (epersero).
+Konten tidak untuk didistribusikan tanpa izin dari PT. Len Industri (Persero).
 
 ---
 
 **Dibuat oleh Alifito Rabbani Cahyono**  
-**PT. Len Industri (epersero) — Backend Engineer Intern**  
-**Tahun: 2024-2025**
+**PT. Len Industri (Persero) — Backend Engineer Intern**  
