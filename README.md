@@ -1,6 +1,6 @@
-# STUDI PERBANDINGAN IMPLEMENTASI WORKFLOW ENGINE
+# STUDI PERBANDINGAN IMPLEMENTASI WORKFLOW ENGINE UNTUK SISTEM MANAJEMEN CUTI KARYAWAN
 
-## Analisis Pendekatan Manual, Flowable BPM, dan Deboot (Service-Based)
+## Analisis Perbandingan Pendekatan Manual (State Machine), Flowable BPM (BPMN Engine), dan Deboot (Service-Based)
 
 ---
 
