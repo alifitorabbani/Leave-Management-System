@@ -4,8 +4,10 @@
 
 ---
 
-**Proyek Riset Internal R&D | PT. Len Industri (Persero)**  
-**Pengembang: Alifito Rabbani Cahyono — Backend Engineer Intern (Workflow Research)**  
+**Proyek: Workflow Engine Comparison**  
+**Perusahaan: PT. Len Industri (Persero)**  
+**Pengembang: Alifito Rabbani Cahyono**  
+**Konteks: Backend Developer Intern — R&D Workflow Engine Comparison**
 
 ---
 
