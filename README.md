@@ -1,4 +1,6 @@
-# Leave Management System — Workflow Engine Comparison
+# STUDI PERBANDINGAN IMPLEMENTASI WORKFLOW ENGINE
+
+## Analisis Pendekatan Manual, Flowable BPM, dan Deboot (Service-Based)
 
 **Proyek Internal R&D | PT. Len Industri (Persero)**  
 **Pengembang: Alifito Rabbani Cahyono — Backend Engineer Intern (Workflow Research)**
